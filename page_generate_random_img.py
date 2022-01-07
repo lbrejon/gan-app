@@ -8,6 +8,7 @@ import os
 from random import randint
 from keras.preprocessing.image import load_img
 
+CURRENT_DIR = "/content/gan-app/"
 
 def show_img_random_generation_page():   
     title = "Generating random images"
@@ -29,7 +30,7 @@ def show_img_random_generation_page():
         col1, col2, col3 = st.sidebar.columns([1,3,1])
 
         # Set empty space to load images
-        img_people = load_img("img/people.png")
+        img_people = load_img(f"{CURRENT_DIR}/img/people.png")
         if known_variables == 1:
             cols = st.columns([1,2,1])
         elif known_variables == 2:
@@ -74,7 +75,7 @@ def show_img_random_generation_page():
                     img_already_displayed.append(numero)
 
                     # Load image
-                    new_image = load_img(f"img/jpeg/{numero}.jpg")                    
+                    new_image = load_img(f"{CURRENT_DIR}/img/jpeg/{numero}.jpg")                    
 
                     # Display image
                     if known_variables == 1:
