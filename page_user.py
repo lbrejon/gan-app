@@ -7,6 +7,7 @@ import base64
 
 import os
 
+CURRENT_DIR = "/content/gan-app/"
 
 
 def get_binary_file_downloader_html(bin_file, file_label='File'):
@@ -48,7 +49,7 @@ def show_user_page():
 
         # Display loaded image
         img = load_img(temp_file.name)
-        img_people = load_img("img/people.png")
+        img_people = load_img(f"{CURRENT_DIR}/img/people.png")
         cols = st.columns([1, 1]) 
         imageLocations = [cols[i].empty() for i in range(len(cols))]       
         imageLocations[0].image(img, use_column_width=True)
@@ -56,7 +57,7 @@ def show_user_page():
 
 
         if ok:
-            filename_gif = "gif/alphonse_generated.gif"
+            filename_gif = f"{CURRENT_DIR}/gif/alphonse_generated.gif"
             file_ = open(filename_gif, "rb")
             contents = file_.read()
             data_url = base64.b64encode(contents).decode("utf-8")
