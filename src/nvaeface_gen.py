@@ -9,11 +9,11 @@ import nvae
 # before executing this file, please execute ./interfacenvae/utils.py to load the model
 # this file should be in the same folder with nvae.py for speed reasons
 
-CODE_DIR = "/content/GenfaceDemo/interfacenvae"
+CODE_DIR = "/content/gan-app/src/interfacenvae"
 
 tmp_download_dir = "/content/downloaded_imgs/"
 
-model_path = "/content/GenfaceDemo/model.pkl"
+model_path = "/content/gan-app/src/model.pkl"
 
 os.chdir(".")
 if not os.path.exists(tmp_download_dir):
@@ -42,6 +42,5 @@ def inference_nvae(model, download_dir):
         print("\n" + tmp_download_dir + img_name + ".jpg")
 
 if __name__ == "__main__":
-    print("CURRENT DIRECTORY: ", os.getcwd())
-    # model = generate_model(model_path, CODE_DIR)
-    # inference_nvae(model, tmp_download_dir)
+    model = generate_model(model_path, CODE_DIR)
+    inference_nvae(model, tmp_download_dir)
