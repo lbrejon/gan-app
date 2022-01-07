@@ -7,7 +7,40 @@ import os
 from random import randint
 from keras.preprocessing.image import load_img
 
+import glob
+import subprocess
+from PIL import Image
+import random
 
+CURRENT_DIR = "/content/gan-app/"
+
+def clear_img_dir():
+    files = glob.glob("/content/downloaded_imgs/*.jpg")
+    for f in files:
+        os.remove(f)
+
+
+def generate_image(age, eyeglasses, gender, pose, smile, noise_seed):
+    var = subprocess.check_output(
+        [
+            "python",
+            "ganface_gen.py",
+            str(age),
+            str(eyeglasses),
+            str(gender),
+            str(pose),
+            str(smile),
+            str(noise_seed),
+        ]
+    )
+
+    # Lit + récupère img générée
+    var_name = var.splitlines()[-1] 
+    file_name = var_name.decode("utf-8")
+
+    with open(file_name, "rb") as file:
+        img = Image.open(file_name)
+    return img
 
 def show_img_specific_generation_page():
     title = "Generating specific images"
@@ -46,6 +79,10 @@ def show_img_specific_generation_page():
     smile = st.sidebar.slider("Smiling", -3.0, 3.0, smile_value, help="'-3.0' corresponds to 'no smiling' and '+3.0' corresponds to 'smiling'")
 
 
+    pose_value = 0.0 if 'pose' not in st.session_state['page2'] else float(st.session_state['page2']['pose'])
+    pose = st.sidebar.slider("Pose", -3.0, 3.0, pose_value, help="'-3.0' corresponds to '??' and '+3.0' corresponds to '??'")
+
+
     # eyeglasses_value = 'Yes' if 'eyeglasses' not in st.session_state['page2'] else st.session_state['page2']['eyeglasses']
     # eyeglasses = st.sidebar.select_slider(
     #     'Eyeglasses',
@@ -56,7 +93,7 @@ def show_img_specific_generation_page():
     eyeglasses = st.sidebar.slider("Glasses", -3.0, 3.0, eyeglasses_value, help="'-3.0' corresponds to 'no eyeglasses' and '+3.0' corresponds to 'eyeglasses'")
 
     # Set empty space to load images
-    img_people = load_img("img/people.png")
+    img_people = load_img(f"{CURRENT_DIR}/img/people.png")
     cols = st.columns([1,4,1])
     imageLocations = [cols[i].empty() for i in range(len(cols))]
     imageLocations[1].image(img_people)
@@ -77,8 +114,28 @@ def show_img_specific_generation_page():
             my_bar.progress(percent_complete + 1)
 
         # Generate specific image with specified features
-        new_image = load_img("gif/generate_specific_img.gif")
-        imageLocations[1].image(new_image)
+        # new_image = load_img(f"{CURRENT_DIR}/gif/generate_specific_img.gif")
+        # imageLocations[1].image(new_image)
+        if not os.path.exists("./noise_seed.txt"):
+            f = open("./noise_seed.txt", "a+")
+            f.write("392")
+            f.close()
+
+        f = open("./noise_seed.txt", "r")
+        noise_seed = int(float(f.read()))
+        f.close()
+
+        noise_seed = random.randint(0, 1000)  # min:0, max:1000, step:1
+        f = open("./noise_seed.txt", "w")
+        f.truncate(0)
+        f.write(str(noise_seed))  # update noise seed
+        f.close()
+
+        clear_img_dir()
+        st.write(age, eyeglasses, gender, pose, smile, noise_seed)
+        image_out = generate_image(age, eyeglasses, gender, pose, smile, noise_seed)
+        # st.image(image_out, use_column_width=True)
+        imageLocations[1].image(image_out)
 
         # Read gif
         # import base64
@@ -91,6 +148,7 @@ def show_img_specific_generation_page():
     # Update session_state dict
     st.session_state['page2'] = {'gender':gender,
                                 'age':age,
+                                'pose':pose,
                                 'smile':smile,
                                 'eyeglasses':eyeglasses,
                                 }
