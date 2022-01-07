@@ -8,7 +8,44 @@ import os
 from random import randint
 from keras.preprocessing.image import load_img
 
+import glob
+import subprocess
+from PIL import Image
+import random
+
+
 CURRENT_DIR = "/content/gan-app/"
+
+
+def clear_img_dir():
+    files = glob.glob("/content/downloaded_imgs/*.jpg")
+    for f in files:
+        os.remove(f)
+
+
+def generate_image(model_name):
+    if model_name == "GAN":
+        st.write("LETS GO GAN")
+    else:
+        st.write("NOP")
+    var = subprocess.check_output(
+        [
+            "python",
+            "/content/gan-app/src/nvaeface_gen.py",
+        ]
+    )
+  
+    
+
+    # Lit + récupère img générée
+    var_name = var.splitlines()[-1] 
+    file_name = var_name.decode("utf-8")
+
+    with open(file_name, "rb") as file:
+        img = Image.open(file_name)
+    return img
+
+
 
 def show_img_random_generation_page():   
     title = "Generating random images"
@@ -54,7 +91,7 @@ def show_img_random_generation_page():
 
         st.sidebar.markdown("""""", unsafe_allow_html=False)                
         ok = col2.button("Generate image")
-        models = {'GAN (StyleGAN2)':option_GAN, 'VAE':option_VAE, 'NVAE':option_NVAE}
+        models = {'GAN':option_GAN, 'VAE':option_VAE, 'NVAE':option_NVAE}
         if ok:
             # Add progress sidebar
             my_bar = st.sidebar.progress(0)
@@ -69,20 +106,26 @@ def show_img_random_generation_page():
                 if model_used == 1:
 
                     # Generate random image
-                    numero = randint(1,5)
-                    while numero in img_already_displayed:
-                        numero = randint(1,5)
-                    img_already_displayed.append(numero)
+                    # numero = randint(1,5)
+                    # while numero in img_already_displayed:
+                    #     numero = randint(1,5)
+                    # img_already_displayed.append(numero)
 
-                    # Load image
-                    new_image = load_img(f"{CURRENT_DIR}/img/jpeg/{numero}.jpg")                    
+                    # # Load image
+                    # new_image = load_img(f"{CURRENT_DIR}/img/jpeg/{numero}.jpg")  
+
+                    # Generate img
+                    clear_img_dir()
+                    image_out = generate_image(model_name)
+                    # st.image(image_out, use_column_width=True)
+                    # imageLocations[1].image(image_out)                  
 
                     # Display image
                     if known_variables == 1:
-                        imageLocations[1].image(new_image) 
+                        imageLocations[1].image(image_out) 
                         cols[1].markdown(f"<h3 style='text-align: center;'>Generated image with {model_name}", unsafe_allow_html=True)
                     else:
-                        imageLocations[i].image(new_image) 
+                        imageLocations[i].image(image_out) 
                         cols[i].markdown(f"<h3 style='text-align: center;'>Generated image with {model_name}", unsafe_allow_html=True)
                         i+=1
 
