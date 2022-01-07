@@ -11,8 +11,8 @@ import pickle
 
 #check if folder /content/downloaded_imgs exists
 tmp_download_folder = "/content/downloaded_imgs"
-CODE_DIR = "/content/GenfaceDemo/interfacenvae"
-model_path = "/content/GenfaceDemo/model.pkl" #storing model once loaded
+CODE_DIR = "/content/gan-app/src/interfacenvae"
+model_path = "/content/gan-app/src/model.pkl" #storing model once loaded
 
 if not os.path.exists(tmp_download_folder):
     os.mkdir(tmp_download_folder)
@@ -23,7 +23,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # make sure that files in local directory can be imported
 sys.path.insert(0, ".")
-os.chdir("/content/GenfaceDemo")
+os.chdir("/content/gan-app/src")
 
 # try to import nvae module and download it if it fails
 import urllib
