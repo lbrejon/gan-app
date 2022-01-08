@@ -51,44 +51,18 @@ def show_img_specific_generation_page():
 
     st.sidebar.title("Features")
 
-    # gender_value = 'male' if 'gender' not in st.session_state['page2'] else st.session_state['page2']['gender']
-    # gender = st.sidebar.select_slider(
-    #     'Gender',
-    #     options=['female','',' ','  ','   ','    ','     ','      ','male'],
-    #     value=(gender_value)
-    # )
     gender_value = 0.0 if 'gender' not in st.session_state['page2'] else float(st.session_state['page2']['gender'])
     gender = st.sidebar.slider("Gender", -3.0, 3.0, gender_value, help="'-3.0' corresponds to 'female' and '+3.0' corresponds to 'male'")
 
-    # age_value = '40' if 'age' not in st.session_state['page2'] else st.session_state['page2']['age']
-    # age = st.sidebar.select_slider(
-    #     'Age (years)',
-    #     options=['10','20','30','40','50','60','70'],
-    #     value=(age_value)
-    # )
     age_value = 0.0 if 'age' not in st.session_state['page2'] else float(st.session_state['page2']['age'])
     age = st.sidebar.slider("Age (years)", -3.0, 3.0, age_value)
 
-    # smile_value = 'Yes' if 'smile' not in st.session_state['page2'] else st.session_state['page2']['smile']
-    # smile = st.sidebar.select_slider(
-    #     'Smiling',
-    #     options=['No','',' ','  ','   ','    ','     ','      ','Yes'],
-    #     value=(smile_value)
-    # )
     smile_value = 0.0 if 'smile' not in st.session_state['page2'] else float(st.session_state['page2']['smile'])
     smile = st.sidebar.slider("Smiling", -3.0, 3.0, smile_value, help="'-3.0' corresponds to 'no smiling' and '+3.0' corresponds to 'smiling'")
-
 
     pose_value = 0.0 if 'pose' not in st.session_state['page2'] else float(st.session_state['page2']['pose'])
     pose = st.sidebar.slider("Pose", -3.0, 3.0, pose_value, help="'-3.0' corresponds to '??' and '+3.0' corresponds to '??'")
 
-
-    # eyeglasses_value = 'Yes' if 'eyeglasses' not in st.session_state['page2'] else st.session_state['page2']['eyeglasses']
-    # eyeglasses = st.sidebar.select_slider(
-    #     'Eyeglasses',
-    #     options=['No','',' ','  ','    ','     ','      ','       ','Yes'],
-    #     value=(eyeglasses_value)
-    # )
     eyeglasses_value = 0.0 if 'eyeglasses' not in st.session_state['page2'] else float(st.session_state['page2']['eyeglasses'])
     eyeglasses = st.sidebar.slider("Glasses", -3.0, 3.0, eyeglasses_value, help="'-3.0' corresponds to 'no eyeglasses' and '+3.0' corresponds to 'eyeglasses'")
 
@@ -96,7 +70,14 @@ def show_img_specific_generation_page():
     img_people = load_img(f"{CURRENT_DIR}/img/people.png")
     cols = st.columns([1,4,1])
     imageLocations = [cols[i].empty() for i in range(len(cols))]
-    imageLocations[1].image(img_people)
+
+    try:
+        noise_seed = st.session_state['page2']['noise_seed']
+    except:
+        imageLocations[1].image(img_people)
+
+    # imageLocations[1].image(img_people) if not hasattr(st.session_state['page2'], 'noise_seed')
+
 
     col1, col2, col3 = st.sidebar.columns([1,3,1])
     ok = col2.button("Generate image")
@@ -131,11 +112,23 @@ def show_img_specific_generation_page():
         f.write(str(noise_seed))  # update noise seed
         f.close()
 
-        clear_img_dir()
-        st.write(age, eyeglasses, gender, pose, smile, noise_seed)
-        image_out = generate_image(age, eyeglasses, gender, pose, smile, noise_seed)
-        # st.image(image_out, use_column_width=True)
-        imageLocations[1].image(image_out)
+
+    if not os.path.exists("./noise_seed.txt"):
+        f = open("./noise_seed.txt", "a+")
+        # noise_seed = random.randint(0, 1000)  # min:0, max:1000, step:1
+        noise_seed = 300
+        f.write(noise_seed)
+        f.close()
+    else:
+        f = open("./noise_seed.txt", "r")
+        noise_seed = int(float(f.read()))
+        f.close()
+
+
+    clear_img_dir()
+    st.write(age, eyeglasses, gender, pose, smile, noise_seed)
+    image_out = generate_image(age, eyeglasses, gender, pose, smile, noise_seed)
+    imageLocations[1].image(image_out)
 
         # Read gif
         # import base64
@@ -151,4 +144,5 @@ def show_img_specific_generation_page():
                                 'pose':pose,
                                 'smile':smile,
                                 'eyeglasses':eyeglasses,
+                                'noise_seed':noise_seed,
                                 }
