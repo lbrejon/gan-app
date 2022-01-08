@@ -40,7 +40,7 @@ def generate_image(age, eyeglasses, gender, pose, smile, noise_seed):
 
     with open(file_name, "rb") as file:
         img = Image.open(file_name)
-    return img
+    return file_name, img
 
 def show_img_specific_generation_page():
     title = "Generating specific images"
@@ -66,15 +66,21 @@ def show_img_specific_generation_page():
     eyeglasses_value = 0.0 if 'eyeglasses' not in st.session_state['page2'] else float(st.session_state['page2']['eyeglasses'])
     eyeglasses = st.sidebar.slider("Glasses", -3.0, 3.0, eyeglasses_value, help="'-3.0' corresponds to 'no eyeglasses' and '+3.0' corresponds to 'eyeglasses'")
 
-    # Set empty space to load images
+    # Set empty space to load images  
     img_people = load_img(f"{CURRENT_DIR}/img/people.png")
-    cols = st.columns([1,4,1])
+
+    cols = st.columns([1,3,3,1])
     imageLocations = [cols[i].empty() for i in range(len(cols))]
 
-    try:
-        noise_seed = st.session_state['page2']['noise_seed']
-    except:
-        imageLocations[1].image(img_people)
+    imageLocations[1].image(img_people)
+    imageLocations[2].image(img_people)
+    if 'img_out_filename' in st.session_state['page2']:
+        img_out_init = load_img(st.session_state['page2']['img_out_filename'])
+        imageLocations[1].image(img_out_init)
+    # try:
+    #     noise_seed = st.session_state['page2']['noise_seed']
+    # except:
+    #     imageLocations[1].image(img_people)
 
     # imageLocations[1].image(img_people) if not hasattr(st.session_state['page2'], 'noise_seed')
 
@@ -95,8 +101,6 @@ def show_img_specific_generation_page():
             my_bar.progress(percent_complete + 1)
 
         # Generate specific image with specified features
-        # new_image = load_img(f"{CURRENT_DIR}/gif/generate_specific_img.gif")
-        # imageLocations[1].image(new_image)
         if not os.path.exists("./noise_seed.txt"):
             f = open("./noise_seed.txt", "a+")
             f.write("392")
@@ -127,8 +131,19 @@ def show_img_specific_generation_page():
 
     clear_img_dir()
     st.write(age, eyeglasses, gender, pose, smile, noise_seed)
-    image_out = generate_image(age, eyeglasses, gender, pose, smile, noise_seed)
-    imageLocations[1].image(image_out)
+    img_out_filename, image_out = generate_image(age, eyeglasses, gender, pose, smile, noise_seed)
+    
+    if not 'img_out_filename' in st.session_state['page2']:
+        imageLocations[1].image(image_out)
+
+    imageLocations[2].image(image_out)
+
+    if not 'img_out_filename' in st.session_state['page2']:
+        import shutil
+        img_out_filename_init_src = img_out_filename
+        os.mkdir("/content/downloaded_imgs/page2/")
+        img_out_filename_init_dst = "/content/downloaded_imgs/page2/img.jpg"
+        shutil.copyfile(img_out_filename_init_src, img_out_filename_init_dst)
 
         # Read gif
         # import base64
@@ -145,4 +160,5 @@ def show_img_specific_generation_page():
                                 'smile':smile,
                                 'eyeglasses':eyeglasses,
                                 'noise_seed':noise_seed,
+                                'img_out_filename': img_out_filename_init_dst,
                                 }
