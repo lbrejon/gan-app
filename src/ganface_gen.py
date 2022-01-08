@@ -13,9 +13,12 @@ import torch
 import matplotlib.pyplot as plt
 import random
 
+DIR = "/content"
+
 # constants and paths
-if not os.path.exists("interfacegan/models/pretrain/stylegan_celebahq.pth"):
-    bashCommand = "wget https://www.dropbox.com/s/nmo2g3u0qt7x70m/stylegan_celebahq.pth?dl=1 -O interfacegan/models/pretrain/stylegan_celebahq.pth --quiet"
+if not os.path.exists(f"{DIR}/interfacegan/models/pretrain/stylegan_celebahq.pth"):
+    os.mkdir(f"{DIR}/interfacegan/models/pretrain")
+    bashCommand = f"wget https://www.dropbox.com/s/nmo2g3u0qt7x70m/stylegan_celebahq.pth?dl=1 -O {DIR}/interfacegan/models/pretrain/stylegan_celebahq.pth --quiet"
     process = subprocess.Popen(bashCommand.split(), stdout=subprocess.PIPE)
     output, error = process.communicate()
 os.chdir("/content")
@@ -89,6 +92,9 @@ if __name__ == "__main__":
     pose = float(sys.argv[4])  # @param {type:"slider", min:-3.0, max:3.0, step:0.1}
     smile = float(sys.argv[5])  # @param {type:"slider", min:-3.0, max:3.0, step:0.1}
     noise_seed=int(sys.argv[6])  # @param changes when 
+
+    # print("age, eyeglasses, gender, pose, smile, noise_seed", age, eyeglasses, gender, pose, smile, noise_seed)
+
     # define latent_codes
     latent_codes, synthesis_kwargs = sample_latentcodes(generator, latent_space_type,noise_seed)
     new_codes = latent_codes.copy()
