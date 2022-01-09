@@ -69,6 +69,11 @@ def show_img_specific_generation_page():
     # Set empty space to load images  
     img_people = load_img(f"{CURRENT_DIR}/img/people.png")
 
+    noise_seed_filename = "/content/noise_seed.txt"
+    if len(st.session_state['page2']) == 0:
+        os.remove(noise_seed_filename)
+
+
     cols = st.columns([1,1])
     imageLocations = [cols[i].empty() for i in range(len(cols))]
 
@@ -103,7 +108,8 @@ def show_img_specific_generation_page():
 
 
         clear_img_dir("/content/downloaded_imgs/page2/*.jpg")
-        del st.session_state['page2']['img_out_filename']
+        for key in list(st.session_state['page2'].keys()):
+            del st.session_state['page2'][key]
         imageLocations[0].image(img_people)
         imageLocations[1].image(img_people)
         # Generate specific image with specified features
@@ -125,9 +131,10 @@ def show_img_specific_generation_page():
 
     if not os.path.exists("./noise_seed.txt"):
         f = open("./noise_seed.txt", "a+")
-        # noise_seed = random.randint(0, 1000)  # min:0, max:1000, step:1
-        noise_seed = 300
-        f.write(noise_seed)
+        noise_seed = random.randint(0, 1000)  # min:0, max:1000, step:1
+        st.write(noise_seed)
+        # noise_seed = 300
+        f.write(str(noise_seed))
         f.close()
     else:
         f = open("./noise_seed.txt", "r")
