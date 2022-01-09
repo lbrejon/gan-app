@@ -14,8 +14,8 @@ import random
 
 CURRENT_DIR = "/content/gan-app/"
 
-def clear_img_dir():
-    files = glob.glob("/content/downloaded_imgs/*.jpg")
+def clear_img_dir(dir2clear="/content/downloaded_imgs/*.jpg"):
+    files = glob.glob(dir2clear)
     for f in files:
         os.remove(f)
 
@@ -69,14 +69,15 @@ def show_img_specific_generation_page():
     # Set empty space to load images  
     img_people = load_img(f"{CURRENT_DIR}/img/people.png")
 
-    cols = st.columns([1,3,3,1])
+    cols = st.columns([1,1])
     imageLocations = [cols[i].empty() for i in range(len(cols))]
 
+    imageLocations[0].image(img_people)
     imageLocations[1].image(img_people)
-    imageLocations[2].image(img_people)
     if 'img_out_filename' in st.session_state['page2']:
+        st.write(st.session_state['page2']['img_out_filename'])
         img_out_init = load_img(st.session_state['page2']['img_out_filename'])
-        imageLocations[1].image(img_out_init)
+        imageLocations[0].image(img_out_init)
     # try:
     #     noise_seed = st.session_state['page2']['noise_seed']
     # except:
@@ -94,21 +95,26 @@ def show_img_specific_generation_page():
                     </style>""", unsafe_allow_html=True)
     if ok:
         # Add progress sidebar
-        my_bar = st.sidebar.progress(0)
-        time.sleep(1)
-        for percent_complete in range(100):
-            time.sleep(0.001)
-            my_bar.progress(percent_complete + 1)
+        # my_bar = st.sidebar.progress(0)
+        # time.sleep(1)
+        # for percent_complete in range(100):
+        #     time.sleep(0.001)
+        #     my_bar.progress(percent_complete + 1)
 
+
+        clear_img_dir("/content/downloaded_imgs/page2/*.jpg")
+        del st.session_state['page2']['img_out_filename']
+        imageLocations[0].image(img_people)
+        imageLocations[1].image(img_people)
         # Generate specific image with specified features
-        if not os.path.exists("./noise_seed.txt"):
-            f = open("./noise_seed.txt", "a+")
-            f.write("392")
-            f.close()
+        # if not os.path.exists("./noise_seed.txt"):
+        #     f = open("./noise_seed.txt", "a+")
+        #     f.write("392")
+        #     f.close()
 
-        f = open("./noise_seed.txt", "r")
-        noise_seed = int(float(f.read()))
-        f.close()
+        # f = open("./noise_seed.txt", "r")
+        # noise_seed = int(float(f.read()))
+        # f.close()
 
         noise_seed = random.randint(0, 1000)  # min:0, max:1000, step:1
         f = open("./noise_seed.txt", "w")
@@ -134,15 +140,26 @@ def show_img_specific_generation_page():
     img_out_filename, image_out = generate_image(age, eyeglasses, gender, pose, smile, noise_seed)
     
     if not 'img_out_filename' in st.session_state['page2']:
-        imageLocations[1].image(image_out)
+        imageLocations[0].image(image_out)
 
-    imageLocations[2].image(image_out)
+    imageLocations[1].image(image_out)
 
     if not 'img_out_filename' in st.session_state['page2']:
         import shutil
+        
+        st.write(st.session_state['page2'])
         img_out_filename_init_src = img_out_filename
-        os.mkdir("/content/downloaded_imgs/page2/")
-        img_out_filename_init_dst = "/content/downloaded_imgs/page2/img.jpg"
+
+        if not os.path.exists("/content/downloaded_imgs/page2/"):
+            os.mkdir("/content/downloaded_imgs/page2/")
+
+        new_img = os.path.basename(img_out_filename_init_src)
+        img_out_filename_init_dst = f"/content/downloaded_imgs/page2/{new_img}"
+        
+        st.session_state['page2'].update({'img_out_filename': img_out_filename_init_dst})
+
+        clear_img_dir("/content/downloaded_imgs/page2/*.jpg")
+        st.write("img_out_filename_init_src, img_out_filename_init_dst",img_out_filename_init_src, img_out_filename_init_dst)
         shutil.copyfile(img_out_filename_init_src, img_out_filename_init_dst)
 
         # Read gif
@@ -154,11 +171,12 @@ def show_img_specific_generation_page():
         # imageLocations[1].markdown(f'<img src="data:image/gif;base64,{data_url}" alt="cat gif">', unsafe_allow_html=True)
 
     # Update session_state dict
-    st.session_state['page2'] = {'gender':gender,
+    st.write(st.session_state['page2'])
+    st.session_state['page2'].update({'gender':gender,
                                 'age':age,
                                 'pose':pose,
                                 'smile':smile,
                                 'eyeglasses':eyeglasses,
                                 'noise_seed':noise_seed,
-                                'img_out_filename': img_out_filename_init_dst,
-                                }
+                                })
+    st.write(st.session_state['page2'])
