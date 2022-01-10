@@ -16,8 +16,8 @@ tfpl = tfp.layers
 
 DIR = "/content/gan-app/src/interfacevae"
 
-DIR_CHECKPOINTS = f"{DIR}/checkpoints"
-
+DIR_CHECKPOINTS = f"{DIR}/checkpoints2"
+tmp_download_dir = "/content/downloaded_imgs"
 
 ###################################################""
 ### VAE Model and config 
@@ -165,7 +165,7 @@ def generate_model():
     vae = Model(inputs=encoder.inputs, outputs=decoder(encoder.outputs))
 
     # Include the epoch in the file name (uses `str.format`)
-    checkpoint_path = f"{DIR_CHECKPOINTS}/cp-{epoch:04d}.ckpt"
+    # checkpoint_path = f"{DIR_CHECKPOINTS}/cp-{epoch:04d}.ckpt"
     # checkpoint_dir = os.path.dirname(checkpoint_path)
     # if not os.path.exists(checkpoint_dir):
     #     os.makedirs(checkpoint_dir)
@@ -185,15 +185,24 @@ def generate_model():
 
 
 if __name__ == "__main__":
-    if not os.path.exists(DIR):
-        os.mkdir(DIR)
-    if not os.path.exists(DIR_CHECKPOINTS):
-        os.mkdir(DIR_CHECKPOINTS)
+    prior = get_prior(num_modes=2, latent_dim=100)
+    kl_regularizer = get_kl_regularizer(prior)
+    encoder = get_encoder(latent_dim=100, kl_regularizer=kl_regularizer)
+    decoder = get_decoder(latent_dim=100)
 
-    prior, decoder = generate_model(model_path, CODE_DIR)
+    # define model
+    vae = Model(inputs=encoder.inputs, outputs=decoder(encoder.outputs))
+    latest = tf.train.latest_checkpoint(DIR_CHECKPOINTS)
+    vae.load_weights(latest)
 
-    n_samples = 1
-    sampled_images = generate_images(prior, decoder, n_samples)
+    n_samples = 10
+
+    z = prior.sample(n_samples)
+    sampled_images = decoder(z).mean()
+
+    # prior, decoder = generate_model(model_path, CODE_DIR)
+    # n_samples = 1
+    # sampled_images = generate_images(prior, decoder, n_samples)
     img_name = "".join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
     output_img = sampled_images[0]
 
