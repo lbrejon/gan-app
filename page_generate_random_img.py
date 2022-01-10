@@ -43,6 +43,13 @@ def generate_image(model_name):
             str(noise_seed),
             ]
     )
+    elif model_name == "VAE":
+        var = subprocess.check_output(
+            [
+                "python",
+                "/content/gan-app/src/vaeface_gen.py",
+            ]
+        )
     else:
         var = subprocess.check_output(
             [
