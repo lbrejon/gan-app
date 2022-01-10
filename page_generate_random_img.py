@@ -25,15 +25,31 @@ def clear_img_dir():
 
 def generate_image(model_name):
     if model_name == "GAN":
-        st.write("LETS GO GAN")
-    else:
-        st.write("NOP")
-    var = subprocess.check_output(
-        [
-            "python",
-            "/content/gan-app/src/nvaeface_gen.py",
-        ]
+        age = 0.0
+        eyeglasses = 0.0
+        gender = 0.0
+        smile = 0.0
+        pose = 0.0
+        noise_seed = random.randint(0, 1000)
+        var = subprocess.check_output(
+            [
+                "python",
+                "/content/ganface_gen.py",
+            str(age),
+            str(eyeglasses),
+            str(gender),
+            str(pose),
+            str(smile),
+            str(noise_seed),
+            ]
     )
+    else:
+        var = subprocess.check_output(
+            [
+                "python",
+                "/content/gan-app/src/nvaeface_gen.py",
+            ]
+        )
   
     
 
@@ -105,15 +121,6 @@ def show_img_random_generation_page():
             for model_name, model_used in models.items():
                 if model_used == 1:
 
-                    # Generate random image
-                    # numero = randint(1,5)
-                    # while numero in img_already_displayed:
-                    #     numero = randint(1,5)
-                    # img_already_displayed.append(numero)
-
-                    # # Load image
-                    # new_image = load_img(f"{CURRENT_DIR}/img/jpeg/{numero}.jpg")  
-
                     # Generate img
                     clear_img_dir()
                     image_out = generate_image(model_name)
@@ -122,10 +129,10 @@ def show_img_random_generation_page():
 
                     # Display image
                     if known_variables == 1:
-                        imageLocations[1].image(image_out) 
+                        imageLocations[1].image(image_out, use_column_width=True) 
                         cols[1].markdown(f"<h3 style='text-align: center;'>Generated image with {model_name}", unsafe_allow_html=True)
                     else:
-                        imageLocations[i].image(image_out) 
+                        imageLocations[i].image(image_out, use_column_width=True) 
                         cols[i].markdown(f"<h3 style='text-align: center;'>Generated image with {model_name}", unsafe_allow_html=True)
                         i+=1
 
