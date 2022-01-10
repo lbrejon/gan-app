@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import zipfile 
 import gdown
+import random
+import string
 from tensorflow.keras import Sequential, Model
 from tensorflow.keras.layers import (Dense, Flatten, Reshape, Conv2D, 
                                      UpSampling2D, BatchNormalization)
@@ -16,7 +18,7 @@ tfpl = tfp.layers
 
 DIR = "/content/gan-app/src/interfacevae"
 
-DIR_CHECKPOINTS = f"{DIR}/checkpoints2"
+DIR_CHECKPOINTS = f"{DIR}/checkpoints"
 tmp_download_dir = "/content/downloaded_imgs"
 
 ###################################################""
@@ -204,15 +206,11 @@ if __name__ == "__main__":
     # n_samples = 1
     # sampled_images = generate_images(prior, decoder, n_samples)
     img_name = "".join(random.choice(string.ascii_uppercase + string.digits) for _ in range(6))
-    output_img = sampled_images[0]
+    output_img = sampled_images[0].numpy()
 
     tmp_download_dir = "/content/downloaded_imgs/"
 
     plt.imsave(tmp_download_dir + img_name + ".jpg", output_img)
     print("\n" + tmp_download_dir + img_name + ".jpg")
-
-
-    # print("/content/downloaded_imgs/init/MB809G.jpg")
-
 
     # inference_vae(model, tmp_download_dir)
