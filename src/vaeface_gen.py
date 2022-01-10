@@ -14,6 +14,10 @@ tfd = tfp.distributions
 tfb = tfp.bijectors
 tfpl = tfp.layers
 
+DIR = "/content/gan-app/src/interfacevae"
+
+DIR_CHECKPOINTS = f"{DIR}/checkpoints"
+
 
 ###################################################""
 ### VAE Model and config 
@@ -98,45 +102,46 @@ def get_decoder(latent_dim):
 
 # blocks
  
-prior = get_prior(num_modes=2, latent_dim=100)
-kl_regularizer = get_kl_regularizer(prior)
-encoder = get_encoder(latent_dim=100, kl_regularizer=kl_regularizer)
-decoder = get_decoder(latent_dim=100)
+# prior = get_prior(num_modes=2, latent_dim=100)
+# kl_regularizer = get_kl_regularizer(prior)
+# encoder = get_encoder(latent_dim=100, kl_regularizer=kl_regularizer)
+# decoder = get_decoder(latent_dim=100)
 
 
 
-########################################################
-# Load model from checkpoints folder (only thing that takes time (250Mb) )  
-########################################################
+# ########################################################
+# # Load model from checkpoints folder (only thing that takes time (250Mb) )  
+# ########################################################
 
 
 
-# define model
-vae = Model(inputs=encoder.inputs, outputs=decoder(encoder.outputs))
+# # define model
+# vae = Model(inputs=encoder.inputs, outputs=decoder(encoder.outputs))
 
-# Include the epoch in the file name (uses `str.format`)
-checkpoint_path = "checkpoints/cp-{epoch:04d}.ckpt"
-checkpoint_dir = os.path.dirname(checkpoint_path)
-if not os.path.exists(checkpoint_dir):
-    os.makedirs(checkpoint_dir)
+# # Include the epoch in the file name (uses `str.format`)
+# DIR_CHECKPOINTS = f"{DIR}/checkpoints"
+# checkpoint_path = f"{DIR_CHECKPOINTS}/cp-{epoch:04d}.ckpt"
+# checkpoint_dir = os.path.dirname(checkpoint_path)
+# if not os.path.exists(checkpoint_dir):
+#     os.makedirs(checkpoint_dir)
 
-# get latest checkpoint files (training can be done separately and checkpoint updated)
-url1="https://drive.google.com/uc?id=1ikqdP9EsTM_1AoTUz0D0PAmD1AUj9Ktx" #ckpt
-url2="https://drive.google.com/uc?id=1fjrS4dnytmZk1Uz14UV0qHs5DEuPgKx0" #
-url3="https://drive.google.com/uc?id=1fH7KRS9vWge6U6Ufwh8nL9Pns9KSReFv" #idx
+# # get latest checkpoint files (training can be done separately and checkpoint updated)
+# url1="https://drive.google.com/uc?id=1ikqdP9EsTM_1AoTUz0D0PAmD1AUj9Ktx" #ckpt
+# url2="https://drive.google.com/uc?id=1fjrS4dnytmZk1Uz14UV0qHs5DEuPgKx0" #
+# url3="https://drive.google.com/uc?id=1fH7KRS9vWge6U6Ufwh8nL9Pns9KSReFv" #idx
 
-gdown.download(url1, "checkpoints/cp-0018.ckpt.data-00000-of-00001", quiet=False)
-gdown.download(url2, "checkpoints/checkpoint", quiet=False)
-gdown.download(url3, "checkpoints/cp-0018.ckpt.index", quiet=False)
+# gdown.download(url1, f"{DIR_CHECKPOINTS}/cp-0018.ckpt.data-00000-of-00001", quiet=False)
+# gdown.download(url2, f"{DIR_CHECKPOINTS}/checkpoint", quiet=False)
+# gdown.download(url3, f"{DIR_CHECKPOINTS}/cp-0018.ckpt.index", quiet=False)
 
-latest = tf.train.latest_checkpoint(checkpoint_dir)
-vae.load_weights(latest)
+# latest = tf.train.latest_checkpoint(checkpoint_dir)
+# vae.load_weights(latest)
 
 
 
-########
-# Generate img 
-#######
+# ########
+# # Generate img 
+# #######
 
 def generate_images(prior, decoder, n_samples):
   z = prior.sample(n_samples)
@@ -160,27 +165,32 @@ def generate_model():
     vae = Model(inputs=encoder.inputs, outputs=decoder(encoder.outputs))
 
     # Include the epoch in the file name (uses `str.format`)
-    checkpoint_path = "checkpoints/cp-{epoch:04d}.ckpt"
-    checkpoint_dir = os.path.dirname(checkpoint_path)
-    if not os.path.exists(checkpoint_dir):
-        os.makedirs(checkpoint_dir)
+    checkpoint_path = f"{DIR_CHECKPOINTS}/cp-{epoch:04d}.ckpt"
+    # checkpoint_dir = os.path.dirname(checkpoint_path)
+    # if not os.path.exists(checkpoint_dir):
+    #     os.makedirs(checkpoint_dir)
 
     # get latest checkpoint files (training can be done separately and checkpoint updated)
-    url1="https://drive.google.com/uc?id=1ikqdP9EsTM_1AoTUz0D0PAmD1AUj9Ktx" #ckpt
-    url2="https://drive.google.com/uc?id=1fjrS4dnytmZk1Uz14UV0qHs5DEuPgKx0" #
-    url3="https://drive.google.com/uc?id=1fH7KRS9vWge6U6Ufwh8nL9Pns9KSReFv" #idx
+    # url1="https://drive.google.com/uc?id=1ikqdP9EsTM_1AoTUz0D0PAmD1AUj9Ktx" #ckpt
+    # url2="https://drive.google.com/uc?id=1fjrS4dnytmZk1Uz14UV0qHs5DEuPgKx0" #
+    # url3="https://drive.google.com/uc?id=1fH7KRS9vWge6U6Ufwh8nL9Pns9KSReFv" #idx
 
-    gdown.download(url1, "checkpoints/cp-0018.ckpt.data-00000-of-00001", quiet=False)
-    gdown.download(url2, "checkpoints/checkpoint", quiet=False)
-    gdown.download(url3, "checkpoints/cp-0018.ckpt.index", quiet=False)
+    # gdown.download(url1, f"{DIR_CHECKPOINTS}/cp-0018.ckpt.data-00000-of-00001", quiet=False)
+    # gdown.download(url2, f"{DIR_CHECKPOINTS}/checkpoint", quiet=False)
+    # gdown.download(url3, f"{DIR_CHECKPOINTS}/cp-0018.ckpt.index", quiet=False)
 
-    latest = tf.train.latest_checkpoint(checkpoint_dir)
+    latest = tf.train.latest_checkpoint(DIR_CHECKPOINTS)
     vae.load_weights(latest)
-    return vae
+    return prior, decoder
 
 
 if __name__ == "__main__":
-    model = generate_model(model_path, CODE_DIR)
+    if not os.path.exists(DIR):
+        os.mkdir(DIR)
+    if not os.path.exists(DIR_CHECKPOINTS):
+        os.mkdir(DIR_CHECKPOINTS)
+
+    prior, decoder = generate_model(model_path, CODE_DIR)
 
     n_samples = 1
     sampled_images = generate_images(prior, decoder, n_samples)
@@ -191,5 +201,9 @@ if __name__ == "__main__":
 
     plt.imsave(tmp_download_dir + img_name + ".jpg", output_img)
     print("\n" + tmp_download_dir + img_name + ".jpg")
+
+
+    # print("/content/downloaded_imgs/init/MB809G.jpg")
+
 
     # inference_vae(model, tmp_download_dir)
