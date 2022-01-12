@@ -25,11 +25,11 @@ def update_dict(gender, age, pose, smile, eyeglasses):
                                 })
 
 def update_slider():
-    st.session_state['page2']["age"] = 0
-    st.session_state['page2']["eyeglasses"] = 0
     st.session_state['page2']["gender"] = 0
-    st.session_state['page2']["pose"] = 0
+    st.session_state['page2']["age"] = 0
     st.session_state['page2']["smile"] = 0
+    st.session_state['page2']["pose"] = 0
+    st.session_state['page2']["eyeglasses"] = 0
 
 
 
@@ -49,7 +49,7 @@ def create_sliders():
     eyeglasses_value = 0.0 if 'eyeglasses' not in st.session_state['page2'] else float(st.session_state['page2']['eyeglasses'])
     eyeglasses = st.sidebar.slider("Eyeglasses", -3.0, 3.0, eyeglasses_value, help="'-3.0' corresponds to 'no eyeglasses' and '+3.0' corresponds to 'eyeglasses'")
 
-    update_dict(gender, age, pose, smile, eyeglasses)
+    # update_dict(gender, age, pose, smile, eyeglasses)
 
 
 
@@ -95,12 +95,44 @@ def show_img_specific_generation_page():
     st.sidebar.title("Features")
 
     # Create sliders
+    # create_sliders()
+
+    # Create button for new img generation
+    col1, col2, col3 = st.sidebar.columns([1,3,1])
+    new_img_button = col2.button("Generate new image")
+    custom_button = st.markdown(""" <style> div.stButton > 
+                        button {background-color: white; 
+                                      color: #4CAF50; 
+                                      border: 2px solid #4CAF50;
+                                     
+                                      }
+                    </style>""", unsafe_allow_html=True) #button:hover 
+                    # position: absolute;
+                    # left: 0px;
+                    # top: 500px;
+    if new_img_button:
+        # Remove existing generated img (initial img -> on the left)
+        clear_img_dir("/content/downloaded_imgs/init/*.jpg")        
+
+        # Generate new noise seed
+        noise_seed = random.randint(0, 1000)
+        f = open(f"{CURRENT_DIR}/noise_seed.txt", "w")
+        f.truncate(0)
+        f.write(str(noise_seed)) # update noise seed
+        f.close()
+
+        # Reset dictionary
+        st.session_state['page2'] = dict()
+        # update_slider()
+        st.write("NEW IMAGE",st.session_state['page2'])
+
+    # Get features value
     create_sliders()
-    age = st.session_state['page2']['age']
-    gender = st.session_state['page2']['gender']
-    pose = st.session_state['page2']['pose']
-    smile = st.session_state['page2']['smile']
-    eyeglasses = st.session_state['page2']['eyeglasses']
+    age = st.session_state['page2']['age'] if 'age' in st.session_state['page2'] else 0
+    gender = st.session_state['page2']['gender'] if 'gender' in st.session_state['page2'] else 0
+    pose = st.session_state['page2']['pose'] if 'pose' in st.session_state['page2'] else 0
+    smile = st.session_state['page2']['smile'] if 'smile' in st.session_state['page2'] else 0
+    eyeglasses = st.session_state['page2']['eyeglasses'] if 'eyeglasses' in st.session_state['page2'] else 0
 
     # Images path
     img_people_path = f"{CURRENT_DIR}/img/people.png"
@@ -115,7 +147,8 @@ def show_img_specific_generation_page():
     
     # imageLocations2[0].image(img_people)
     # imageLocations2[1].image(img_people)
-
+    st.write("INITIALISATION", st.session_state['page2'])
+    
     # Display initial generated img (on the left)
     if 'img_init_generated_path' in st.session_state['page2']:
         img_init_generated_path = st.session_state['page2']['img_init_generated_path']
@@ -126,89 +159,90 @@ def show_img_specific_generation_page():
     else:
       clear_img_dir("/content/downloaded_imgs/init/*.jpg")
 
-    # Create button for new img generation
-    col1, col2, col3 = st.sidebar.columns([1,3,1])
-    new_img_button = col2.button("Generate new image")
-    custom_button = st.markdown(""" <style> div.stButton > 
-                        button:hover {background-color: white; 
-                                      color: #4CAF50; 
-                                      border: 2px solid #4CAF50;}
-                    </style>""", unsafe_allow_html=True)
+    
 
-    if new_img_button:
-        # Remove existing generated img (initial img -> on the left)
-        clear_img_dir("/content/downloaded_imgs/init/*.jpg")        
+    # if new_img_button:
+    #     # Remove existing generated img (initial img -> on the left)
+    #     clear_img_dir("/content/downloaded_imgs/init/*.jpg")        
 
-        # Generate new noise seed
-        noise_seed = random.randint(0, 1000)
-        f = open(f"{CURRENT_DIR}/noise_seed.txt", "w")
-        f.truncate(0)
-        f.write(str(noise_seed)) # update noise seed
-        f.close()
+    #     # Generate new noise seed
+    #     noise_seed = random.randint(0, 1000)
+    #     f = open(f"{CURRENT_DIR}/noise_seed.txt", "w")
+    #     f.truncate(0)
+    #     f.write(str(noise_seed)) # update noise seed
+    #     f.close()
 
-        # Reset dictionary
-        # st.session_state['page2'] = dict()
+    #     # Reset dictionary
+    #     st.session_state['page2'] = dict()
+    #     st.write(st.session_state['page2'])
+
+        # st.session_state['page2']['flag'] = False
+
+        # st.session_state['page2']["age"] = 0
+        # st.session_state['page2']["eyeglasses"] = 0
+        # st.session_state['page2']["gender"] = 0
+        # st.session_state['page2']["pose"] = 0
+        # st.session_state['page2']["smile"] = 0
         # st.write(st.session_state['page2'])
-        # update_dict()
-        st.session_state['page2']["age"] = 0
-        st.session_state['page2']["eyeglasses"] = 0
-        st.session_state['page2']["gender"] = 0
-        st.session_state['page2']["pose"] = 0
-        st.session_state['page2']["smile"] = 0
+
         # del st.session_state['page2']['noise_seed']
         # del st.session_state['page2']['img_init_generated_path']
-
-    # Check if 'noise_seed.txt' file exists else create a file (for initialization)
-    if not 'noise_seed' in st.session_state['page2']:
-        f = open(f"{CURRENT_DIR}/noise_seed.txt", "w")
-        noise_seed = random.randint(0, 1000)
-        st.session_state['page2']['noise_seed'] = noise_seed # Add noise seed value in dictionary
-        f.write(str(noise_seed))
-        f.close()
-        st.write("INIT")
-    else:
-        noise_seed = st.session_state['page2']['noise_seed']
-
-    # Remove existing generated img (processed img -> on the right)
-    clear_img_dir("/content/downloaded_imgs/*.jpg")
-
-    # Generate processed img
-    img_generated_path, img_generated = generate_image(age, eyeglasses, gender, pose, smile, noise_seed)
-    
-    # Display generated img (on the right)
-    if not 'img_init_generated_path' in st.session_state['page2']:
-        imageLocations1[1].image(img_generated)
-    else:
-        imageLocations2[1].image(img_generated)
-    
-    # Save img generated path as img initial generated
-    if not 'img_init_generated_path' in st.session_state['page2']:
-        img_init_generated_path = img_generated_path
-
-        # Create directory to save initial img
-        img_init_dir = "/content/downloaded_imgs/init"
-        if not os.path.exists(img_init_dir):
-            os.mkdir(img_init_dir)
-
-        # Remove existing img initial
-        clear_img_dir("{img_init_dir}/*.jpg")
-
-        # Copy img initial in specific directory for future loading
-        img_name = os.path.basename(img_init_generated_path)
-        img_generated_path = f"{img_init_dir}/{img_name}"
-        shutil.copyfile(img_init_generated_path, img_generated_path)
-        
-        # Update dictionary
-        st.session_state['page2']['noise_seed'] = noise_seed
-        st.session_state['page2'].update({'img_init_generated_path': img_generated_path}) # add 'img_init_generated_path' in dictionary to save image initial path
+        # imageLocations1 = [cols1[i].empty() for i in range(len(cols1))]
+        # imageLocations2 = [cols2[i].empty() for i in range(len(cols2))]
 
 
-        # Read gif
-        # import base64
-        # file_ = open(f"gif/generate_specific_img.gif", "rb")
-        # contents = file_.read()
-        # data_url = base64.b64encode(contents).decode("utf-8")
-        # file_.close()
-        # imageLocations[1].markdown(f'<img src="data:image/gif;base64,{data_url}" alt="cat gif">', unsafe_allow_html=True)
+    if True:
+      # Check if 'noise_seed.txt' file exists else create a file (for initialization)
+      if not 'noise_seed' in st.session_state['page2']:
+          f = open(f"{CURRENT_DIR}/noise_seed.txt", "w")
+          noise_seed = random.randint(0, 1000)
+          st.session_state['page2']['noise_seed'] = noise_seed # Add noise seed value in dictionary
+          f.write(str(noise_seed))
+          f.close()
+      else:
+          noise_seed = st.session_state['page2']['noise_seed']
+
+      # Remove existing generated img (processed img -> on the right)
+      clear_img_dir("/content/downloaded_imgs/*.jpg")
+
+      # Generate processed img
+      img_generated_path, img_generated = generate_image(age, eyeglasses, gender, pose, smile, noise_seed)
+      
+      # Display generated img (on the right)
+      if not 'img_init_generated_path' in st.session_state['page2']:
+          imageLocations1[1].image(img_generated)
+      else:
+          imageLocations2[1].image(img_generated)
+      
+      # Save img generated path as img initial generated
+      if not 'img_init_generated_path' in st.session_state['page2']:
+          img_init_generated_path = img_generated_path
+
+          # Create directory to save initial img
+          img_init_dir = "/content/downloaded_imgs/init"
+          if not os.path.exists(img_init_dir):
+              os.mkdir(img_init_dir)
+
+          # Remove existing img initial
+          clear_img_dir("{img_init_dir}/*.jpg")
+
+          # Copy img initial in specific directory for future loading
+          img_name = os.path.basename(img_init_generated_path)
+          img_generated_path = f"{img_init_dir}/{img_name}"
+          shutil.copyfile(img_init_generated_path, img_generated_path)
+          
+          # Update dictionary
+          st.session_state['page2']['noise_seed'] = noise_seed
+          st.session_state['page2'].update({'img_init_generated_path': img_generated_path}) # add 'img_init_generated_path' in dictionary to save image initial path
+
+      
+
+          # Read gif
+          # import base64
+          # file_ = open(f"gif/generate_specific_img.gif", "rb")
+          # contents = file_.read()
+          # data_url = base64.b64encode(contents).decode("utf-8")
+          # file_.close()
+          # imageLocations[1].markdown(f'<img src="data:image/gif;base64,{data_url}" alt="cat gif">', unsafe_allow_html=True)
 
     st.write(st.session_state['page2'])
