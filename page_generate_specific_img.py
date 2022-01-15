@@ -44,12 +44,12 @@ def create_sliders():
     smile = st.sidebar.slider("Smiling", -3.0, 3.0, smile_value, help="'-3.0' corresponds to 'no smiling' and '+3.0' corresponds to 'smiling'")
 
     pose_value = 0.0 if 'pose' not in st.session_state['page2'] else float(st.session_state['page2']['pose'])
-    pose = st.sidebar.slider("Pose", -3.0, 3.0, pose_value, help="'-3.0' corresponds to '??' and '+3.0' corresponds to '??'")
+    pose = st.sidebar.slider("Pose", -3.0, 3.0, pose_value, help="'-3.0' corresponds to 'looks to the right' and '+3.0' corresponds to 'looks to the left'")
 
     eyeglasses_value = 0.0 if 'eyeglasses' not in st.session_state['page2'] else float(st.session_state['page2']['eyeglasses'])
     eyeglasses = st.sidebar.slider("Eyeglasses", -3.0, 3.0, eyeglasses_value, help="'-3.0' corresponds to 'no eyeglasses' and '+3.0' corresponds to 'eyeglasses'")
 
-    # update_dict(gender, age, pose, smile, eyeglasses)
+    update_dict(gender, age, pose, smile, eyeglasses)
 
 
 
@@ -95,7 +95,7 @@ def show_img_specific_generation_page():
     st.sidebar.title("Features")
 
     # Create sliders
-    # create_sliders()
+    create_sliders()
 
     # Create button for new img generation
     col1, col2, col3 = st.sidebar.columns([1,3,1])
@@ -123,11 +123,12 @@ def show_img_specific_generation_page():
 
         # Reset dictionary
         st.session_state['page2'] = dict()
+
         # update_slider()
-        st.write("NEW IMAGE",st.session_state['page2'])
+        # st.write("NEW IMAGE",st.session_state['page2']) #to debug
 
     # Get features value
-    create_sliders()
+    # create_sliders()
     age = st.session_state['page2']['age'] if 'age' in st.session_state['page2'] else 0
     gender = st.session_state['page2']['gender'] if 'gender' in st.session_state['page2'] else 0
     pose = st.session_state['page2']['pose'] if 'pose' in st.session_state['page2'] else 0
@@ -145,9 +146,7 @@ def show_img_specific_generation_page():
     imageLocations1 = [cols1[i].empty() for i in range(len(cols1))]
     imageLocations2 = [cols2[i].empty() for i in range(len(cols2))]
     
-    # imageLocations2[0].image(img_people)
-    # imageLocations2[1].image(img_people)
-    st.write("INITIALISATION", st.session_state['page2'])
+    # st.write("INITIALISATION", st.session_state['page2'])  #to debug
     
     # Display initial generated img (on the left)
     if 'img_init_generated_path' in st.session_state['page2']:
@@ -158,37 +157,6 @@ def show_img_specific_generation_page():
 
     else:
       clear_img_dir("/content/downloaded_imgs/init/*.jpg")
-
-    
-
-    # if new_img_button:
-    #     # Remove existing generated img (initial img -> on the left)
-    #     clear_img_dir("/content/downloaded_imgs/init/*.jpg")        
-
-    #     # Generate new noise seed
-    #     noise_seed = random.randint(0, 1000)
-    #     f = open(f"{CURRENT_DIR}/noise_seed.txt", "w")
-    #     f.truncate(0)
-    #     f.write(str(noise_seed)) # update noise seed
-    #     f.close()
-
-    #     # Reset dictionary
-    #     st.session_state['page2'] = dict()
-    #     st.write(st.session_state['page2'])
-
-        # st.session_state['page2']['flag'] = False
-
-        # st.session_state['page2']["age"] = 0
-        # st.session_state['page2']["eyeglasses"] = 0
-        # st.session_state['page2']["gender"] = 0
-        # st.session_state['page2']["pose"] = 0
-        # st.session_state['page2']["smile"] = 0
-        # st.write(st.session_state['page2'])
-
-        # del st.session_state['page2']['noise_seed']
-        # del st.session_state['page2']['img_init_generated_path']
-        # imageLocations1 = [cols1[i].empty() for i in range(len(cols1))]
-        # imageLocations2 = [cols2[i].empty() for i in range(len(cols2))]
 
 
     if True:
@@ -245,4 +213,4 @@ def show_img_specific_generation_page():
           # file_.close()
           # imageLocations[1].markdown(f'<img src="data:image/gif;base64,{data_url}" alt="cat gif">', unsafe_allow_html=True)
 
-    st.write(st.session_state['page2'])
+    # st.write(st.session_state['page2'])  #to debug
