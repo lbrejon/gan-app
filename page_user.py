@@ -67,7 +67,7 @@ def show_user_page():
             colAA, colBB, colCC, colDD = st.columns([1,1,2,1])
             colCC.download_button(label="Download GIF 📥", 
                                   data=file_,
-                                  file_name=filename_gif.replace("gif/","gif/downloaded/"),
+                                  file_name=os.path.basename(filename_gif),
                                   mime="image/gif")
             file_.close()
 
