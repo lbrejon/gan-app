@@ -106,7 +106,9 @@
 
 ###########################################################################################
 
-
+from htbuilder import HtmlElement, div, ul, li, br, hr, a, p, img, styles, classes, fonts
+from htbuilder.units import percent, px
+from htbuilder.funcs import rgba, rgb
 
 import streamlit as st
 from streamlit.elements.form import current_form_id
@@ -119,6 +121,66 @@ from keras.preprocessing.image import load_img
 import base64
 
 
+logo_EMMK_path = "https://i.postimg.cc/nrPDmbNF/logo-EMMK-2022.jpg"
+logo_GenFace_path = "https://i.postimg.cc/pTdQ5ZyB/logo-genface192x192.png"
+
+
+footer="""<style>
+a:link , a:visited{
+color: blue;
+background-color: transparent;
+text-decoration: underline;
+}
+
+a:hover,  a:active {
+color: red;
+background-color: transparent;
+text-decoration: underline;
+}
+
+.footer {
+position: fixed;
+left: 0;
+bottom: 0;
+width: 117%;
+# height: 100px;
+background-color: white;
+color: black;
+text-align: center;
+}
+
+.header {
+position: fixed;
+left: 0;
+bottom: 0;
+width: 30%;
+height: 100%;
+background-color: white;
+color: black;
+text-align: center;
+# font-family:markdown
+# font-size: 30px;
+# font-weight: bold;
+
+}
+
+</style>
+
+
+<div class="footer">
+<p><img class="fit-picture"
+            src="https://i.postimg.cc/pTdQ5ZyB/logo-genface192x192.png"
+            width=100px>
+    <img class="fit-picture"
+            src="https://i.postimg.cc/nrPDmbNF/logo-EMMK-2022.jpg"
+            width=90px>
+</div>
+"""
+st.markdown(footer, unsafe_allow_html=True)
+
+# <p>Developed with ❤ by <a style='display: block; text-align: center;' href="https://www.heflin.dev/" target="_blank">Heflin Stephen Raj S</a></p>
+
+
 if 'status' not in st.session_state:
     st.session_state['status'] = True
     st.session_state['nb_loaded_pages'] = 0
@@ -126,11 +188,6 @@ if 'status' not in st.session_state:
     st.session_state['page2'] = dict()
     st.session_state['page3'] = dict()
 
-# main_bg = "img/logoEMMK.png"
-# main_bg_ext = "png"
-
-# img_logo = load_img(main_bg)
-# st.sidebar.image(img_logo)
 
 pages = ["Home 🏠", "Generate random images 🎲", "Generate specific images 🎯", "Who would you look like.. ? 🔮"]
 
@@ -141,9 +198,8 @@ if st.session_state['status']:
     st.session_state['nb_loaded_pages'] += 1
     # st.write(st.session_state)
 
-
 if st.session_state['current_page'] == pages[1]:
-    data = show_img_random_generation_page()
+    show_img_random_generation_page()
 elif st.session_state['current_page'] == pages[2]:
     show_img_specific_generation_page()
 elif st.session_state['current_page'] == pages[3]:
