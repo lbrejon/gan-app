@@ -111,8 +111,8 @@ def show_img_random_generation_page():
                                         border: 2px solid #4CAF50;}
                         </style>""", unsafe_allow_html=True)
 
-
-        st.sidebar.markdown("""""", unsafe_allow_html=False)                
+        st.sidebar.markdown("""""", unsafe_allow_html=False)
+     
         ok = col2.button("Generate image")
         models = {'GAN':option_GAN, 'VAE':option_VAE, 'NVAE':option_NVAE}
         if ok:
